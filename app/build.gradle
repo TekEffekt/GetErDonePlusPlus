@@ -31,4 +31,5 @@ dependencies {
     compile ('com.fortysevendeg.swipelistview:swipelistview:1.0-SNAPSHOT@aar') {
         transitive = true
     }
+    compile 'org.apache.directory.studio:org.apache.commons.io:2.4'
 }

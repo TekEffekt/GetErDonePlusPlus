@@ -26,7 +26,7 @@ import java.util.List;
 
 public class ToDoListActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
-    ListPopulator adapter;
+    RemoteListPopulator adapter;
     ListView toDoListView;
 
     ToDoListActivity mActivity = this;
@@ -38,27 +38,9 @@ public class ToDoListActivity extends AppCompatActivity implements AdapterView.O
 
     String currentSortMethod = "Importance";
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_to_do_list);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        adapter = new ListPopulator(this);
-        adapter.master = this;
-        toDoListView = (ListView)findViewById(R.id.task_list);
-
+    public void finishSetup()
+    {
         toDoListView.setAdapter(adapter);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AddTaskDialogeFragment frag = new AddTaskDialogeFragment();
-                frag.show(getFragmentManager(), "addTask");
-            }
-        });
 
         toDoListView.setOnTouchListener(new SwipeDismissListViewTouchListener(
                         toDoListView,
@@ -75,28 +57,39 @@ public class ToDoListActivity extends AppCompatActivity implements AdapterView.O
                             public void onDismiss(ListView listView, int[] reverseSortedPositions) {
                                 Log.d("Debug", "Removed");
 
-                                if (adapter.tasks.size() > 1) {
-                                    adapter.removeTask(gPosition);
-                                    ListPopulator a = new ListPopulator(getApplicationContext());
-                                    a.master = mActivity;
-                                    toDoListView.setAdapter(a);
-                                    adapter = a;
-                                    sort();
-                                }
+                                adapter.removeTask(gPosition);
+                                listView.setAdapter(adapter);
                             }
-                })
+                        })
         );
 
         setupSortSpinner();
+        sort();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_to_do_list);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        adapter = new RemoteListPopulator(this);
+        adapter.master = this;
+        toDoListView = (ListView)findViewById(R.id.task_list);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AddTaskDialogeFragment frag = new AddTaskDialogeFragment();
+                frag.show(getFragmentManager(), "addTask");
+            }
+        });
     }
 
     public void createTask(ToDoTask task) {
         adapter.addTask(task);
-        ListPopulator a = new ListPopulator(getApplicationContext());
-        a.master = mActivity;
-        toDoListView.setAdapter(a);
-        adapter = a;
-        sort();
     }
 
     public void setupSortSpinner()
